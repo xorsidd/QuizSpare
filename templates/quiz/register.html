@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - QuizSphere{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card border-0 shadow rounded-4 overflow-hidden bg-white">
+                <div class="bg-primary text-white p-4 text-center">
+                    <div class="brand-icon-wrapper bg-white text-primary mx-auto mb-2" style="width: 48px; height: 48px;">
+                        <i class="bi bi-person-plus-fill fs-3"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1 text-white">Join QuizSphere</h4>
+                    <p class="small text-white-50 mb-0">Create your student account to take quizzes and track scores</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form method="post" action="{% url 'register' %}">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger p-2 small mb-3">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Username</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Email Address</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Password (Min 6 characters)</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small mt-1">{{ form.password.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold small">Confirm Password</label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}
+                                <div class="text-danger small mt-1">{{ form.confirm_password.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold shadow-sm mb-3">
+                            <i class="bi bi-check-circle me-1"></i> Register Student Account
+                        </button>
+                    </form>
+
+                    <div class="text-center small text-muted">
+                        Already have an account? 
+                        <a href="{% url 'login' %}" class="fw-semibold text-primary text-decoration-none">Log In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

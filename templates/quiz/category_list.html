@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz Categories - QuizSphere{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center mb-5">
+        <div class="col-md-7">
+            <h1 class="fw-bold mb-2">Available Quiz Categories</h1>
+            <p class="text-muted mb-0">Select any subject below to test your mastery and earn a spot on the leaderboard.</p>
+        </div>
+        <div class="col-md-5 mt-3 mt-md-0">
+            <form method="get" action="{% url 'category_list' %}" class="d-flex gap-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="q" value="{{ search_query }}" class="form-control border-start-0 ps-0" placeholder="Search categories (e.g. Python, Django)...">
+                    {% if search_query %}
+                        <a href="{% url 'category_list' %}" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary px-3 rounded-3">Search</button>
+            </form>
+        </div>
+    </div>
+
+    {% if search_query %}
+        <div class="alert alert-info py-2 px-3 small mb-4 rounded-3 d-flex justify-content-between align-items-center">
+            <span>Showing results for <strong>"{{ search_query }}"</strong></span>
+            <a href="{% url 'category_list' %}" class="alert-link text-decoration-none">Clear filter</a>
+        </div>
+    {% endif %}
+
+    <div class="row g-4">
+        {% for cat in categories %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card quiz-card h-100 p-4 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="rounded-3 bg-primary-subtle text-primary p-3 fs-3 d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
+                            <i class="bi {{ cat.icon|default:'bi-journal-code' }}"></i>
+                        </div>
+                        <span class="badge bg-secondary-subtle text-secondary fw-semibold">
+                            <i class="bi bi-clock me-1"></i> {{ cat.time_limit_mins }} mins
+                        </span>
+                    </div>
+                    <h4 class="fw-bold mb-2">{{ cat.name }}</h4>
+                    <p class="text-muted small mb-3">{{ cat.description }}</p>
+                </div>
+                
+                <div>
+                    <div class="d-flex justify-content-between align-items-center text-secondary small py-2 mb-3 border-top border-bottom">
+                        <span><i class="bi bi-patch-question me-1"></i> {{ cat.total_questions }} Questions</span>
+                        <span><i class="bi bi-trophy me-1"></i> Pass: {{ cat.pass_percentage }}%</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'category_detail' slug=cat.slug %}" class="btn btn-outline-primary flex-grow-1 rounded-pill fw-semibold">
+                            View Rules &amp; Start <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 py-5 text-center">
+            <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+            <h4 class="fw-bold text-muted">No categories match your search.</h4>
+            <p class="text-secondary small">Try searching for another topic or clear the search query.</p>
+            <a href="{% url 'category_list' %}" class="btn btn-primary rounded-pill px-4 mt-2">View All Categories</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

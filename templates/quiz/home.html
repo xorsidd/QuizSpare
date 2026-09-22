@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}QuizSphere - Online Quiz Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-gradient py-5 position-relative">
+    <div class="container position-relative py-lg-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-20 text-warning small mb-3">
+                    <i class="bi bi-patch-check-fill"></i>
+                    <span>Python &amp; Django Web Application • Mini Project</span>
+                </div>
+                <h1 class="display-4 fw-extrabold text-white mb-3">
+                    Master Technical Skills with <span class="text-warning">Instant Feedback</span>.
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    <strong>QuizSphere</strong> makes learning fast and engaging. Built with Python and Django, it provides timed online quizzes, automated grading, live leaderboards, and detailed attempt reviews.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a href="{% url 'category_list' %}" class="btn btn-primary btn-lg px-4 rounded-pill shadow">
+                        <i class="bi bi-play-circle-fill me-2"></i> Start a Quiz
+                    </a>
+                    <a href="{% url 'leaderboard' %}" class="btn btn-warning btn-lg px-4 rounded-pill text-dark fw-bold">
+                        <i class="bi bi-trophy-fill me-2"></i> Leaderboard
+                    </a>
+                    <a href="{% url 'presentation_showcase' %}" class="btn btn-outline-light btn-lg px-4 rounded-pill">
+                        <i class="bi bi-diagram-3 me-2"></i> Architecture &amp; PPT
+                    </a>
+                </div>
+                <div class="row g-3 pt-2 text-white-50 small border-top border-white border-opacity-10">
+                    <div class="col-auto d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success"></i> Instant Auto-Grading
+                    </div>
+                    <div class="col-auto d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success"></i> Countdown Timers
+                    </div>
+                    <div class="col-auto d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success"></i> Detailed Reviews
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hero Sample Question Box (Slide 2 Direct Replica) -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white text-dark">
+                    <div class="card-header bg-dark text-white py-3 px-4 d-flex justify-content-between align-items-center">
+                        <span class="small text-uppercase fw-bold text-warning letter-spacing-1">
+                            <i class="bi bi-lightning-charge-fill me-1"></i> Slide 2 Sample Question
+                        </span>
+                        <span class="badge bg-primary-subtle text-primary">Live Demo</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="badge bg-secondary-subtle text-secondary">Topic: Django Basics</span>
+                            <span class="text-danger fw-semibold small font-mono"><i class="bi bi-clock me-1"></i> 00:45</span>
+                        </div>
+                        <h5 class="fw-bold mb-3">Which language is Django written in?</h5>
+                        
+                        <div class="d-flex flex-column gap-2 mb-3">
+                            <div class="p-3 border rounded-3 d-flex align-items-center gap-2 bg-light">
+                                <span class="badge bg-secondary text-white">A</span>
+                                <span>Java</span>
+                            </div>
+                            <div class="p-3 border rounded-3 d-flex align-items-center justify-content-between bg-success bg-opacity-10 border-success text-success fw-bold">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-success text-white">B</span>
+                                    <span>Python</span>
+                                </div>
+                                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                            </div>
+                            <div class="p-3 border rounded-3 d-flex align-items-center gap-2 bg-light">
+                                <span class="badge bg-secondary text-white">C</span>
+                                <span>C++</span>
+                            </div>
+                            <div class="p-3 border rounded-3 d-flex align-items-center gap-2 bg-light">
+                                <span class="badge bg-secondary text-white">D</span>
+                                <span>PHP</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-primary-subtle text-primary small p-3 rounded-3 mb-3">
+                            <i class="bi bi-info-circle-fill me-1"></i> <strong>Instant Evaluation:</strong> Django is an open-source web framework written entirely in Python.
+                        </div>
+
+                        <a href="{% url 'category_list' %}" class="btn btn-primary w-100 rounded-pill fw-semibold">
+                            Explore All Quizzes <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Metrics Row -->
+<div class="container mt-n4 position-relative" style="margin-top: -2.5rem; z-index: 10;">
+    <div class="row g-3">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 text-center p-3 bg-white">
+                <div class="fs-2 fw-bold text-primary">{{ total_quizzes_taken }}</div>
+                <div class="small text-muted text-uppercase fw-semibold">Quizzes Attempted</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 text-center p-3 bg-white">
+                <div class="fs-2 fw-bold text-success">{{ categories.count }}</div>
+                <div class="small text-muted text-uppercase fw-semibold">Subject Categories</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 text-center p-3 bg-white">
+                <div class="fs-2 fw-bold text-warning">{{ total_questions }}</div>
+                <div class="small text-muted text-uppercase fw-semibold">Active Questions</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 text-center p-3 bg-white">
+                <div class="fs-2 fw-bold text-info">100%</div>
+                <div class="small text-muted text-uppercase fw-semibold">Auto-Graded Instant</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Categories Grid -->
+<section class="py-5 bg-white border-top border-bottom mt-4">
+    <div class="container py-3">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold text-uppercase small mb-2">Subject Quizzes</span>
+                <h2 class="fw-bold mb-1">Explore Quiz Categories</h2>
+                <p class="text-muted mb-0">Select a topic below to begin your timed examination.</p>
+            </div>
+            <a href="{% url 'category_list' %}" class="btn btn-outline-primary rounded-pill px-4">
+                View All Categories <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for cat in categories %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card quiz-card h-100 p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="rounded-3 bg-primary-subtle text-primary p-3 fs-3 d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
+                                <i class="bi {{ cat.icon|default:'bi-journal-code' }}"></i>
+                            </div>
+                            <span class="badge bg-secondary-subtle text-secondary fw-semibold">
+                                <i class="bi bi-clock me-1"></i> {{ cat.time_limit_mins }} mins
+                            </span>
+                        </div>
+                        <h4 class="fw-bold mb-2">{{ cat.name }}</h4>
+                        <p class="text-muted small mb-3">{{ cat.description|truncatewords:16 }}</p>
+                    </div>
+                    
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center text-secondary small py-2 mb-3 border-top border-bottom">
+                            <span><i class="bi bi-question-circle me-1"></i> {{ cat.total_questions }} Questions</span>
+                            <span><i class="bi bi-trophy me-1"></i> Pass: {{ cat.pass_percentage }}%</span>
+                        </div>
+                        <a href="{% url 'category_detail' slug=cat.slug %}" class="btn btn-outline-primary w-100 rounded-pill fw-semibold">
+                            Attempt Quiz <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="py-5 bg-dark text-white text-center">
+    <div class="container py-4">
+        <h2 class="display-6 fw-bold text-white mb-3">Ready to Test Your Knowledge?</h2>
+        <p class="lead text-white-50 max-w-600 mx-auto mb-4">
+            Take a quiz, challenge your friends on the leaderboard, and master technical concepts with instant automated evaluation.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{% url 'category_list' %}" class="btn btn-primary btn-lg rounded-pill px-5">Start a Quiz</a>
+            <a href="{% url 'leaderboard' %}" class="btn btn-outline-light btn-lg rounded-pill px-5">View Leaderboard</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

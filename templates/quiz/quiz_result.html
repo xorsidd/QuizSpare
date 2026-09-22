@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz Results - {{ attempt.category.name }} - QuizSphere{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            
+            <!-- Result Banner Card (Slide 6 & 8) -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="p-5 text-center {% if attempt.passed %}bg-success bg-opacity-10{% else %}bg-danger bg-opacity-10{% endif %}">
+                    <div class="score-circle mb-3 {% if attempt.passed %}passed{% else %}failed{% endif %}">
+                        <div class="fs-2 fw-bold text-dark">{{ attempt.score }}/{{ attempt.total_marks }}</div>
+                        <div class="small fw-semibold text-muted">{{ attempt.percentage }}%</div>
+                    </div>
+
+                    {% if attempt.passed %}
+                        <span class="badge bg-success fs-6 px-4 py-2 rounded-pill mb-2">
+                            <i class="bi bi-check-circle-fill me-1"></i> Examination Passed!
+                        </span>
+                        <h3 class="fw-bold text-success mb-1">Congratulations, {{ attempt.user.username }}!</h3>
+                        <p class="text-muted max-w-600 mx-auto small">
+                            You met the required passing threshold of {{ attempt.category.pass_percentage }}% for <strong>{{ attempt.category.name }}</strong>.
+                        </p>
+                    {% else %}
+                        <span class="badge bg-danger fs-6 px-4 py-2 rounded-pill mb-2">
+                            <i class="bi bi-x-circle-fill me-1"></i> Passing Threshold Not Met
+                        </span>
+                        <h3 class="fw-bold text-danger mb-1">Keep Learning, {{ attempt.user.username }}!</h3>
+                        <p class="text-muted max-w-600 mx-auto small">
+                            You scored {{ attempt.percentage }}%, below the passing mark of {{ attempt.category.pass_percentage }}%. Review your answers below and try again!
+                        </p>
+                    {% endif %}
+
+                    <!-- Key Result Metrics -->
+                    <div class="row g-2 justify-content-center mt-3">
+                        <div class="col-auto">
+                            <span class="badge bg-white text-dark border px-3 py-2 rounded-pill">
+                                <i class="bi bi-clock-history text-primary me-1"></i> 
+                                Time: {{ attempt.time_taken_seconds }}s
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-white text-dark border px-3 py-2 rounded-pill">
+                                <i class="bi bi-trophy-fill text-warning me-1"></i> 
+                                Category Rank: #{{ rank }}
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-white text-dark border px-3 py-2 rounded-pill">
+                                <i class="bi bi-calendar3 text-secondary me-1"></i> 
+                                {{ attempt.date_taken|date:"M d, Y H:i" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="card-footer bg-white border-top p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'quiz_take' slug=attempt.category.slug %}" class="btn btn-outline-primary rounded-pill btn-sm px-3">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Retake Quiz
+                        </a>
+                        <a href="{% url 'leaderboard' %}?category={{ attempt.category.id }}" class="btn btn-outline-warning text-dark rounded-pill btn-sm px-3">
+                            <i class="bi bi-trophy me-1"></i> Category Leaderboard
+                        </a>
+                    </div>
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary rounded-pill btn-sm px-4">
+                        <i class="bi bi-speedometer2 me-1"></i> Go to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- Detailed Question-by-Question Audit Review (Slide 3 & 6) -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0">Detailed Question Review</h4>
+                <span class="small text-muted">Total: {{ answers|length }} questions reviewed</span>
+            </div>
+
+            {% for ans in answers %}
+            <div class="card border-0 shadow-sm rounded-4 mb-3">
+                <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-0">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold text-dark">Q{{ forloop.counter }}.</span>
+                        {% if ans.is_correct %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                <i class="bi bi-check-circle me-1"></i> Correct (+{{ ans.marks_obtained }} mark{{ ans.marks_obtained|pluralize }})
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                <i class="bi bi-x-circle me-1"></i> Incorrect (0 / {{ ans.question.marks }})
+                            </span>
+                        {% endif %}
+                    </div>
+                    <span class="text-muted small">Max Marks: {{ ans.question.marks }}</span>
+                </div>
+
+                <div class="card-body p-4 pt-2">
+                    <h6 class="fw-bold mb-3">{{ ans.question.text }}</h6>
+
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        {% for opt in ans.question.options.all %}
+                            {% if opt.is_correct %}
+                                <!-- This is the correct answer -->
+                                <div class="review-option correct-choice d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                        <span>{{ opt.text }}</span>
+                                    </div>
+                                    <span class="badge bg-success text-white">Correct Answer</span>
+                                </div>
+                            {% elif opt == ans.selected_option and not opt.is_correct %}
+                                <!-- User selected this wrong option -->
+                                <div class="review-option wrong-choice d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-x-circle-fill text-danger fs-5"></i>
+                                        <span>{{ opt.text }}</span>
+                                    </div>
+                                    <span class="badge bg-danger text-white">Your Incorrect Selection</span>
+                                </div>
+                            {% else %}
+                                <!-- Other neutral options -->
+                                <div class="review-option bg-light text-muted d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                        <span>{{ opt.text }}</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    {% if not ans.selected_option %}
+                        <div class="small text-danger mb-2">
+                            <i class="bi bi-exclamation-triangle"></i> You did not provide an answer for this question.
+                        </div>
+                    {% endif %}
+
+                    {% if ans.question.explanation %}
+                        <div class="p-3 bg-primary-subtle text-primary rounded-3 small">
+                            <i class="bi bi-lightbulb-fill me-1"></i> <strong>Explanation:</strong> {{ ans.question.explanation }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Bottom Navigation -->
+            <div class="text-center py-4">
+                <a href="{% url 'category_list' %}" class="btn btn-outline-primary rounded-pill px-4 me-2">
+                    <i class="bi bi-arrow-left me-1"></i> Explore More Quizzes
+                </a>
+                <a href="{% url 'dashboard' %}" class="btn btn-primary rounded-pill px-4">
+                    <i class="bi bi-speedometer2 me-1"></i> View My Score Dashboard
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

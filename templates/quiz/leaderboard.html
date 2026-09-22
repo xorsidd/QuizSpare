@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Leaderboard - QuizSphere{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center max-w-700 mx-auto mb-5">
+        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold text-uppercase small mb-2">
+            <i class="bi bi-trophy-fill me-1"></i> Competitive Ranking
+        </span>
+        <h1 class="fw-bold">QuizSphere Leaderboard</h1>
+        <p class="text-muted">Celebrating top technical performers across all assessments.</p>
+    </div>
+
+    <!-- Category Filter Bar -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+        <form method="get" action="{% url 'leaderboard' %}" class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-filter text-primary fs-5"></i>
+                <label for="cat-filter" class="fw-semibold small mb-0">Filter by Category:</label>
+                <select name="category" id="cat-filter" class="form-select form-select-sm w-auto rounded-pill" onchange="this.form.submit()">
+                    <option value="">All Categories (Global)</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if selected_category.id == cat.id %}selected{% endif %}>
+                            {{ cat.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {% if selected_category %}
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary-subtle text-primary">Active: {{ selected_category.name }}</span>
+                    <a href="{% url 'leaderboard' %}" class="btn btn-outline-secondary btn-sm rounded-pill">Clear Filter</a>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Leaderboard Table Card -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3" style="width: 80px;">Rank</th>
+                        <th class="py-3">Candidate</th>
+                        <th class="py-3">Subject / Category</th>
+                        <th class="py-3 text-center">Score</th>
+                        <th class="py-3 text-center">Percentage</th>
+                        <th class="py-3 text-center">Time Taken</th>
+                        <th class="pe-4 py-3 text-end">Date Attempted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in top_attempts %}
+                    <tr {% if item.user == user %}class="table-primary bg-opacity-25"{% endif %}>
+                        <td class="ps-4">
+                            {% if forloop.counter == 1 %}
+                                <span class="badge bg-warning text-dark rounded-circle p-2 fs-6 shadow-sm" title="Gold Trophy">
+                                    <i class="bi bi-trophy-fill"></i> 1
+                                </span>
+                            {% elif forloop.counter == 2 %}
+                                <span class="badge bg-secondary text-white rounded-circle p-2 fs-6 shadow-sm" title="Silver Medal">
+                                    <i class="bi bi-award-fill"></i> 2
+                                </span>
+                            {% elif forloop.counter == 3 %}
+                                <span class="badge bg-danger bg-opacity-75 text-white rounded-circle p-2 fs-6 shadow-sm" title="Bronze Medal">
+                                    <i class="bi bi-patch-check-fill"></i> 3
+                                </span>
+                            {% else %}
+                                <span class="fw-bold text-muted ps-2">#{{ forloop.counter }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="avatar-circle">{{ item.user.username|slice:":1"|upper }}</span>
+                                <div>
+                                    <span class="fw-bold text-dark">{{ item.user.username }}</span>
+                                    {% if item.user == user %}
+                                        <span class="badge bg-primary-subtle text-primary fs-xs ms-1">You</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi {{ item.category.icon|default:'bi-journal' }} me-1 text-primary"></i>
+                                {{ item.category.name }}
+                            </span>
+                        </td>
+                        <td class="text-center font-mono fw-bold">
+                            {{ item.score }}/{{ item.total_marks }}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge {% if item.passed %}bg-success-subtle text-success border border-success-subtle{% else %}bg-danger-subtle text-danger border border-danger-subtle{% endif %} px-3 py-1 font-mono">
+                                {{ item.percentage }}%
+                            </span>
+                        </td>
+                        <td class="text-center text-muted small font-mono">
+                            {{ item.time_taken_seconds }}s
+                        </td>
+                        <td class="pe-4 text-end text-muted small">
+                            {{ item.date_taken|date:"M d, Y" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-trophy fs-1 d-block mb-2 text-muted"></i>
+                            <h5 class="fw-bold">No attempts recorded yet!</h5>
+                            <p class="small">Be the first to complete a quiz and claim the #1 spot on the leaderboard.</p>
+                            <a href="{% url 'category_list' %}" class="btn btn-primary btn-sm rounded-pill px-4">Take a Quiz Now</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}My Dashboard - QuizSphere{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Welcome Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-5">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="avatar-circle fs-5" style="width: 36px; height: 36px;">{{ user.username|slice:":1"|upper }}</span>
+                <h2 class="fw-bold mb-0">Welcome, {{ user.username }}!</h2>
+            </div>
+            <p class="text-muted mb-0">Here is a complete analytics breakdown of your QuizSphere learning journey.</p>
+        </div>
+        <div>
+            <a href="{% url 'category_list' %}" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Attempt New Quiz
+            </a>
+        </div>
+    </div>
+
+    <!-- Metric Cards (Slide 6 Analytics) -->
+    <div class="row g-3 mb-5">
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center">
+                <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-3 d-inline-flex mx-auto mb-2">
+                    <i class="bi bi-clock-history fs-4"></i>
+                </div>
+                <div class="fs-2 fw-bold text-dark font-mono">{{ total_attempts }}</div>
+                <div class="text-muted small fw-semibold text-uppercase">Quizzes Attempted</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center">
+                <div class="rounded-circle bg-success bg-opacity-10 text-success p-3 d-inline-flex mx-auto mb-2">
+                    <i class="bi bi-check2-circle fs-4"></i>
+                </div>
+                <div class="fs-2 fw-bold text-success font-mono">{{ passed_attempts }}</div>
+                <div class="text-muted small fw-semibold text-uppercase">Assessments Passed</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center">
+                <div class="rounded-circle bg-info bg-opacity-10 text-info p-3 d-inline-flex mx-auto mb-2">
+                    <i class="bi bi-percent fs-4"></i>
+                </div>
+                <div class="fs-2 fw-bold text-info font-mono">{{ pass_rate }}%</div>
+                <div class="text-muted small fw-semibold text-uppercase">Pass Rate</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center">
+                <div class="rounded-circle bg-warning bg-opacity-10 text-warning p-3 d-inline-flex mx-auto mb-2">
+                    <i class="bi bi-award fs-4"></i>
+                </div>
+                <div class="fs-2 fw-bold text-warning font-mono">{{ highest_score }}%</div>
+                <div class="text-muted small fw-semibold text-uppercase">Highest Score</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attempt History Table (Slide 6 & 8) -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0"><i class="bi bi-list-check me-2 text-primary"></i> Attempt History</h5>
+            <span class="badge bg-secondary-subtle text-secondary">{{ attempts.count }} records</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3">#</th>
+                        <th class="py-3">Subject / Category</th>
+                        <th class="py-3 text-center">Score</th>
+                        <th class="py-3 text-center">Percentage</th>
+                        <th class="py-3 text-center">Status</th>
+                        <th class="py-3 text-center">Time Spent</th>
+                        <th class="py-3">Timestamp</th>
+                        <th class="pe-4 py-3 text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in attempts %}
+                    <tr>
+                        <td class="ps-4 text-muted small font-mono">{{ forloop.counter }}</td>
+                        <td>
+                            <div class="fw-semibold text-dark">
+                                <i class="bi {{ item.category.icon|default:'bi-journal' }} me-1 text-primary"></i>
+                                {{ item.category.name }}
+                            </div>
+                        </td>
+                        <td class="text-center font-mono fw-bold">
+                            {{ item.score }} / {{ item.total_marks }}
+                        </td>
+                        <td class="text-center font-mono">
+                            {{ item.percentage }}%
+                        </td>
+                        <td class="text-center">
+                            {% if item.passed %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">
+                                    <i class="bi bi-check-circle me-1"></i> Passed
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1">
+                                    <i class="bi bi-x-circle me-1"></i> Failed
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center text-muted small font-mono">
+                            {{ item.time_taken_seconds }}s
+                        </td>
+                        <td class="text-muted small">
+                            {{ item.date_taken|date:"M d, Y H:i" }}
+                        </td>
+                        <td class="pe-4 text-end">
+                            <a href="{% url 'quiz_result' attempt_id=item.id %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                <i class="bi bi-eye me-1"></i> Audit Review
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-journal-x fs-1 d-block mb-2 text-muted"></i>
+                            <h5 class="fw-bold">No quiz attempts found.</h5>
+                            <p class="small">Choose a category and take your first online quiz today.</p>
+                            <a href="{% url 'category_list' %}" class="btn btn-primary btn-sm rounded-pill px-4">Browse Quizzes</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
